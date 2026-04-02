@@ -1,141 +1,188 @@
 # AgroFusion Score 🌾
 
-> Explainable decision-support system for merit-based agricultural subsidy allocation in Kazakhstan.  
-> Built for **Decentrathon 5.0 — AI for Government, Case 2**.
+**AgroFusion Score** — это прототип системы, которая помогает **оценивать и ранжировать заявки на агросубсидии** не по принципу «кто раньше подал», а по качеству и рискам заявки.
+
+Проект сделан для **Decentrathon 5.0**, трек **AI for Government**, **Кейс 2**.
 
 ---
 
-## Overview
+## Зачем нужен проект
 
-AgroFusion Score is an **AI/data-driven prototype** for ranking agricultural subsidy applications based on merit rather than submission order.
+Сейчас субсидии часто распределяются по очереди подачи. Из-за этого деньги могут получить не самые эффективные хозяйства, а те, кто просто быстрее отправил документы.
 
-The system helps a ministry or committee:
+**AgroFusion Score** помогает комиссии:
+- быстро увидеть **рейтинг заявок**;
+- понять, **почему заявка получила такой балл**;
+- выделить **лучших кандидатов**;
+- отдельно отметить **рискованные заявки**, которые нужно проверить вручную.
 
-- **rank** applicants using transparent scoring logic,
-- **explain** why each application received its result,
-- **flag risks** that require manual review,
-- **form a shortlist** for commission review,
-- **analyze newly uploaded applications** without rebuilding the whole system from scratch.
-
-This is a **decision-support tool**, not an automatic approval engine.  
-The final decision remains with a human commission.
+Важно: система **не принимает решение вместо человека**, а только помогает комиссии.
 
 ---
 
-## Problem
+## Что умеет система
 
-Today, agricultural subsidies are often distributed by a **first-come-first-served** logic: whoever submits a complete application earlier has a better chance of receiving funding before the budget runs out.
+Прототип уже умеет:
 
-This creates several problems:
-
-- effective farms may lose funding to faster applicants,
-- prior subsidy usage quality is not sufficiently considered,
-- risk factors are hard to compare consistently,
-- commissions spend too much time on manual triage.
-
-The hackathon task requires a system that uses **AI/ML and data analysis** to rank applicants, explain results, and support human review.
-
----
-
-## Solution
-
-AgroFusion Score implements a **hybrid scoring pipeline**:
-
-1. **Rule-based explainable score**  
-   Calculates the core score from transparent business logic:
-   - historical performance proxy,
-   - compliance / discipline signals,
-   - geo / eco-risk proxy.
-
-2. **ML-based differentiation layer**  
-   Adds a data-driven ranking signal to separate similar applications more finely.
-
-3. **Final recommendation engine**  
-   Produces one of several recommendations:
-   - approve as priority,
-   - approve with caution,
-   - manual review,
-   - defer due to high risk,
-   - reject if baseline eligibility fails.
-
-4. **Interactive review interface**  
-   Lets the user:
-   - filter ranked applications,
-   - inspect shortlist,
-   - open a detailed card for each application,
-   - upload new data for additional scoring.
+- загружать заявки;
+- считать итоговый балл для каждой заявки;
+- ранжировать заявки от сильных к слабым;
+- показывать **shortlist** кандидатов на одобрение;
+- объяснять результат по каждой заявке;
+- выделять рискованные случаи;
+- загружать **новые данные** и отдельно их анализировать;
+- экспортировать результаты в CSV.
 
 ---
 
-## Why this is useful for government
+## Как считается оценка
 
-AgroFusion Score is designed for **human decision support** in subsidy allocation.
+Итоговая оценка строится из нескольких частей:
 
-It helps a commission:
+### 1. История
+Смотрим на доступные исторические сигналы по заявителю.
 
-- move from queue-based distribution to **merit-based prioritization**,
-- make decisions faster using a ranked shortlist,
-- understand the drivers behind each result,
-- keep the final authority with human experts.
+### 2. Надёжность / соответствие
+Проверяем признаки нарушений, рисков и проблем в прошлом.
 
-This matches the hackathon requirement that AI must **assist**, not replace, the expert.
+### 3. Эко/гео риск
+Оцениваем риск, связанный с регионом, кормовой базой и нагрузкой.
 
----
-
-## Core Scoring Logic
-
-Each application first receives a **rule-based score (0–100)** from three components.
-
-### 1. Historical Score
-Measures an applicant’s past effectiveness proxy.
-
-Signals used in MVP:
-- historical subsidy amount,
-- historical livestock delta proxy,
-- norm-to-request relationship,
-- previous application patterns.
-
-### 2. Compliance Score
-Measures execution discipline and operational risk.
-
-Signals used:
-- violations count,
-- mortality-related risk flag,
-- compliance penalties with score caps.
-
-### 3. Eco Score
-Measures ecological / feed sufficiency risk.
-
-Signals used:
-- feed availability proxy by region,
-- livestock density / headcount proxy by district,
-- eco risk zone:
-  - green,
-  - yellow,
-  - red.
+### 4. ML-слой
+Дополнительно используется ML-модель, чтобы лучше различать похожие заявки и сделать ранжирование точнее.
 
 ---
 
-## Farm Route Logic
+## Что получает пользователь
 
-Applications are classified into one of three routes depending on subsidy direction:
+Для каждой заявки система показывает:
 
-- **Extensive** — meat / pasture / breeding-oriented livestock logic
-- **Intensive** — poultry / swine / high-intensity production logic
-- **Hybrid** — mixed / dairy / AI-service related logic
+- ID заявки;
+- регион и район;
+- направление субсидии;
+- итоговый балл;
+- уровень риска;
+- рекомендацию:
+  - **Одобрить приоритетно**
+  - **Одобрить с оговоркой**
+  - **Нужна ручная проверка**
+  - **Отложить из-за высокого риска**
+  - **Отклонить**
 
-Each route has different score weights for:
-- historical factors,
-- compliance,
-- eco risk.
+Также система показывает, **какие факторы повлияли на результат**.
 
 ---
 
-## Hybrid Final Score
+## Почему это полезно
 
-After the explainable rule-based score is computed, the system applies an additional **ML ranking layer**.
+Проект помогает перейти от подхода **«кто первый подал — тот получил»** к более справедливому подходу:
 
-### Final combined score
+- быстрее разбирать заявки;
+- видеть сильных кандидатов;
+- снижать риск ошибок;
+- делать процесс более прозрачным и понятным.
 
-```text
-Final Combined Score = 60% Rule-Based Score + 40% ML Score
+---
+
+## Как запустить проект
+
+### 1. Создать виртуальное окружение
+```bash
+python -m venv .venv
+2. Активировать его
+Windows
+
+
+.venv\Scripts\activate
+
+Linux / macOS
+
+
+source .venv/bin/activate
+
+3. Установить зависимости
+
+pip install -r requirements.txt
+
+4. Запустить приложение
+
+streamlit run agrofusion_score/main.py
+
+После запуска открой в браузере:
+
+http://localhost:8501
+
+Структура проекта
+agrofusion_score/
+  constants.py
+  data_processor.py
+  geo_validator.py
+  main.py
+  ml_scorer.py
+  pipeline.py
+  rules_engine.py
+  schemas.py
+  tests/
+
+scripts/
+README.md
+requirements.txt
+
+Какие данные используются
+Основной вход:
+
+
+файл с заявками на субсидии (csv, xlsx, xls)
+Дополнительно могут использоваться:
+
+
+данные по поголовью;
+
+данные по кормам;
+
+исторические показатели;
+
+демо-данные для прототипа.
+Ограничения MVP
+Это хакатонный прототип, поэтому важно честно отметить ограничения:
+
+
+часть сигналов в модели пока является proxy-оценкой, а не полноценной реальной метрикой;
+
+ML-часть помогает в ранжировании, но не является единственным источником истины;
+
+некоторые эко/гео показатели считаются на основе приближённых данных;
+
+система не заменяет комиссию, а помогает ей принимать решение.
+Что уже есть в прототипе
+
+рабочий Streamlit-интерфейс;
+
+рейтинг заявок;
+
+карточка заявки;
+
+shortlist;
+
+explainability;
+
+загрузка новых данных;
+
+экспорт результатов.
+Что можно улучшать дальше
+
+усилить аналитику для новых загружаемых данных;
+
+улучшить скорость загрузки;
+
+сделать объяснение результатов ещё нагляднее;
+
+подключить более полные реальные данные;
+
+доработать модель вместе с отраслевыми экспертами.
+Кратко
+AgroFusion Score — это объяснимая система поддержки принятия решений для распределения агросубсидий.
+
+Она помогает комиссии быстрее видеть сильные и слабые заявки, понимать причины оценки и принимать более обоснованные решения.
+
+помоги сделать read.me файл на этот текст
